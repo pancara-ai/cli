@@ -125,7 +125,7 @@ class Client {
           signal: AbortSignal.timeout(15000),
           headers: {
             accept: "application/json",
-            "user-agent": "NutriqCLI/0.1.0",
+            "user-agent": "NutriqCLI/0.1.1",
             ...options.token ? { authorization: `Bearer ${options.token}` } : {},
             ...options.body ? { "content-type": "application/json" } : {}
           },
@@ -284,6 +284,8 @@ More records available. Repeat this command with the same filters and --cursor $
       return `${plain(data.meal_type || "Meal")} · ${plain(data.meal_date)}
 ID: ${plain(data.id)}
 Status: ${plain(data.status)}
+Started at: ${plain(data.occurred_at)}
+Duration (minutes): ${plain(data.duration_minutes)}
 Score: ${plain(data.score)}
 ` + list(data.participants).map((p) => `
 ${plain(p.display_name)}${p.is_partial ? " · partial estimate" : ""}
@@ -304,11 +306,17 @@ Note: ` + plain(data.note) : "");
 
 ${details(data.summary)}
 
+Diet structure
+${details(data.structure)}
+
+Nutrient scorecard
 ${details(data.scorecard)}`;
     case "plans":
       return `${plain(data.title || "Meal plans")}
 
-${table(["Date", "Meal", "Status", "Dishes"], list(data.timeline).map((p) => [p.date, p.label ?? p.slot, p.state, list(p.draft?.dishes).map((d) => plain(d.name)).join(", ") || "—"]))}`;
+` + (data.learning ? details(data.learning) : list(data.timeline).length ? list(data.timeline).map((p) => details({ date: p.date, meal: p.label ?? p.slot, state: p.state, diners: p.diners, draft: p.draft })).join(`
+
+`) : "No records found.");
     case "health":
       return `Health · ${plain(data.source)}
 
@@ -332,7 +340,7 @@ var commands = {
   today: { description: "Read a day overview; date defaults to the account timezone.", path: "/v1/today", options: { date: "string", member: "string" } },
   meals: { description: "List full meal records. Follow next_cursor for subsequent pages.", path: "/v1/meals", options: { date: "string", member: "string", cursor: "string", limit: "string" } },
   meal: { description: "Read one meal and its current observation: nutriq meal <id>.", path: "/v1/meals/" },
-  trends: { description: "Read nutrition trends. --week is the start date of a week.", path: "/v1/trends", options: { week: "string", member: "string" } },
+  trends: { description: "Read nutrition trends. Defaults to this week; --week takes precedence over --period.", path: "/v1/trends", options: { week: "string", period: "string", member: "string" } },
   family: { description: "Read the household and member IDs.", path: "/v1/household" },
   devices: { description: "Read household device status.", path: "/v1/devices" },
   plans: { description: "Read the current meal plans.", path: "/v1/plans" },
@@ -350,13 +358,14 @@ var optionHelp = {
   member: "Family member ID (defaults to you)",
   cursor: "Continue from the previous page’s next_cursor",
   limit: "Number of meals to return (1–100)",
-  week: "Start date of the week (YYYY-MM-DD)"
+  week: "Start date of the week (YYYY-MM-DD)",
+  period: "week or recent_7_days (default: week)"
 };
 function help(command, json = false) {
   const publicCommands = Object.fromEntries(Object.entries(commands).map(([name, { path, ...definition }]) => [name, definition]));
   if (json) {
     jsonFormat = true;
-    output(command ? { command, ...publicCommands[command] } : { name: "nutriq", version: "0.1.0", commands: publicCommands });
+    output(command ? { command, ...publicCommands[command] } : { name: "nutriq", version: "0.1.1", commands: publicCommands });
     return;
   }
   const lines = command ? [
@@ -406,7 +415,7 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    output({ version: "0.1.0" });
+    output({ version: "0.1.1" });
     return;
   }
   const definition = commands[command];
@@ -447,6 +456,8 @@ async function main() {
   }
   if (values.limit && (!/^\d+$/.test(String(values.limit)) || Number(values.limit) < 1 || Number(values.limit) > 100))
     throw new CliError("INVALID_ARGUMENT", "--limit must be 1–100.", 2);
+  if (values.period && !["week", "recent_7_days"].includes(String(values.period)))
+    throw new CliError("INVALID_ARGUMENT", "--period must be week or recent_7_days.", 2);
   const origin = process.env.NUTRIQ_BASE_URL || (values.env === "dev" ? "https://api-dev.pancara.ai" : "https://api.pancara.ai");
   const environment = process.env.NUTRIQ_BASE_URL ? `custom-${createHash("sha256").update(origin).digest("hex").slice(0, 16)}` : String(values.env);
   const store = new CredentialsStore(environment);
@@ -528,7 +539,7 @@ async function main() {
     return;
   }
   const query = new URLSearchParams;
-  for (const [flag, key] of Object.entries({ date: "date", member: "member_id", week: "week_start", cursor: "cursor", limit: "limit" }))
+  for (const [flag, key] of Object.entries({ date: "date", member: "member_id", week: "week_start", period: "period", cursor: "cursor", limit: "limit" }))
     if (values[flag])
       query.set(key, String(values[flag]));
   const path = definition.path + (command === "meal" ? encodeURIComponent(positionals[0]) : "") + (query.size ? `?${query}` : "");

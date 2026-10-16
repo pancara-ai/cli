@@ -7,7 +7,7 @@ Read your Pancara Nutriq meals, nutrition trends, profile, family, plans, health
 Requires Node.js 22 or later and npm. This repository contains the built CLI, ready to install:
 
 ```sh
-npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.0.tar.gz
+npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.1.tar.gz
 nutriq --version
 nutriq login
 ```
@@ -21,12 +21,15 @@ nutriq today
 nutriq meals --date 2026-09-21
 nutriq meal <meal_id>
 nutriq trends
+nutriq trends --period recent_7_days
 nutriq profile
 nutriq family
 nutriq --help
 ```
 
 Append `--json` for structured output. Run `nutriq <command> --help` for available options. Run `nutriq logout` to revoke this computer's CLI connection.
+
+Trends default to this week. Use `--period recent_7_days` for the last seven days including today, or `--week YYYY-MM-DD` for a specific week (takes precedence over `--period`). Text output includes meal start time and duration, diet structure, and plan diners, groceries and reminder state.
 
 ## Agent skill
 

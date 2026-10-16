@@ -1,6 +1,6 @@
 {
   "name": "@pancara/nutriq-cli",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "Nutriq meals, trends and devices for people and AI assistants",
   "type": "module",
   "bin": { "nutriq": "dist/main.js" },

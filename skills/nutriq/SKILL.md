@@ -5,7 +5,7 @@ description: Query the user's Pancara Nutriq meal records, nutrition trends, pro
 
 # Nutriq
 
-Use `nutriq --help` for available commands, and `nutriq <command> --help` for arguments. If the executable is missing, install the official CLI with `npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.0.tar.gz` (requires Node.js 22 or later), then verify with `nutriq --version`. Account access requires the user's authorization below.
+Use `nutriq --help` for available commands, and `nutriq <command> --help` for arguments. If the executable is missing, install the official CLI with `npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.1.tar.gz` (requires Node.js 22 or later), then verify with `nutriq --version`. Account access requires the user's authorization below.
 
 Always append `--json` to data and authorization commands below, for example `nutriq today --json` and `nutriq login --no-wait --json`. Default output is for humans and may summarize fields; JSON preserves the complete response. Use `nutriq --help --json` for a machine-readable command schema.
 
@@ -19,7 +19,7 @@ After the user confirms, run `nutriq login --wait`. Keep `--env dev` on every co
 
 - “What did I eat today?” → `nutriq today`, then `nutriq meal <id>` for complete food details. Today is an overview and may abbreviate food names.
 - Meals by date → `nutriq meals --date YYYY-MM-DD`. Follow `next_cursor` with `--cursor` until null before claiming a complete list.
-- Nutrition trends → `nutriq trends`, or `--week YYYY-MM-DD` for a specific week.
+- Nutrition trends → `nutriq trends` for this week, `--period recent_7_days` for the last seven days including today, or `--week YYYY-MM-DD` for a specific week. `--week` takes precedence over `--period`.
 - Profile and goals → `nutriq profile`. Account and timezone → `nutriq whoami`.
 - Family member IDs → `nutriq family`; use `--member <id>` on today, meals or trends. Default is the current user's member. Ask if a name is ambiguous.
 - Other data → `nutriq plans`, `nutriq devices`, `nutriq health`, `nutriq live`.
