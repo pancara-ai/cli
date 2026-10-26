@@ -7,7 +7,7 @@ Read your Pancara Nutriq meals, nutrition trends, profile, family, plans, health
 Requires Node.js 22 or later and npm. This repository contains the built CLI, ready to install:
 
 ```sh
-npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.1.tar.gz
+npm install -g github:pancara-ai/cli
 nutriq --version
 nutriq login
 ```
@@ -39,4 +39,4 @@ npx skills add pancara-ai/skills --skill nutriq -g -y
 
 The skill provides installation, authorization, and data interpretation instructions. Account access requires your confirmation.
 
-[Nutriq](https://platform.pancara.ai/nutriq)
+[Nutriq CLI](https://platform.pancara.ai/nutriq/cli/)

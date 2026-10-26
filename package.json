@@ -1,12 +1,12 @@
 {
   "name": "@pancara/nutriq-cli",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "description": "Nutriq meals, trends and devices for people and AI assistants",
   "type": "module",
   "bin": { "nutriq": "dist/main.js" },
   "files": ["dist", "skills", "README.md"],
   "engines": { "node": ">=22" },
   "repository": { "type": "git", "url": "https://github.com/pancara-ai/cli.git" },
-  "homepage": "https://platform.pancara.ai/nutriq",
+  "homepage": "https://platform.pancara.ai/nutriq/cli/",
   "dependencies": { "@napi-rs/keyring": "^1.2.0", "proper-lockfile": "^4.1.2", "qrcode": "^1.5.4" }
 }

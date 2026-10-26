@@ -5,7 +5,7 @@ description: Query the user's Pancara Nutriq meal records, nutrition trends, pro
 
 # Nutriq
 
-Use `nutriq --help` for available commands, and `nutriq <command> --help` for arguments. If the executable is missing, install the official CLI with `npm install -g https://github.com/pancara-ai/cli/archive/refs/tags/v0.1.1.tar.gz` (requires Node.js 22 or later), then verify with `nutriq --version`. Account access requires the user's authorization below.
+Use `nutriq --help` for available commands, and `nutriq <command> --help` for arguments. If the executable is missing, install the official CLI with `npm install -g github:pancara-ai/cli` (requires Node.js 22 or later), then verify with `nutriq --version`. Account access requires the user's authorization below.
 
 Always append `--json` to data and authorization commands below, for example `nutriq today --json` and `nutriq login --no-wait --json`. Default output is for humans and may summarize fields; JSON preserves the complete response. Use `nutriq --help --json` for a machine-readable command schema.
 

@@ -125,7 +125,7 @@ class Client {
           signal: AbortSignal.timeout(15000),
           headers: {
             accept: "application/json",
-            "user-agent": "NutriqCLI/0.1.1",
+            "user-agent": "NutriqCLI/0.1.2",
             ...options.token ? { authorization: `Bearer ${options.token}` } : {},
             ...options.body ? { "content-type": "application/json" } : {}
           },
@@ -166,7 +166,11 @@ class Client {
         throw new CliError("AUTH_REQUIRED", "Run nutriq login to authorize this computer.", 3);
       if (saved.access_token && saved.access_token !== rejected && (saved.expires_at ?? 0) > Date.now() + 60000)
         return saved.access_token;
-      const next = await this.request("/v1/cli/refresh", { method: "POST", body: { refresh_token: saved.refresh_token }, retry: true });
+      const next = await this.request("/v1/cli/refresh", { method: "POST", body: { refresh_token: saved.refresh_token }, retry: true }).catch(async (error) => {
+        if (error instanceof CliError && error.exit === 3)
+          await this.store.write({});
+        throw error;
+      });
       await this.store.write({ ...saved, ...next, expires_at: Date.now() + next.expires_in * 1000 });
       return next.access_token;
     });
@@ -365,7 +369,7 @@ function help(command, json = false) {
   const publicCommands = Object.fromEntries(Object.entries(commands).map(([name, { path, ...definition }]) => [name, definition]));
   if (json) {
     jsonFormat = true;
-    output(command ? { command, ...publicCommands[command] } : { name: "nutriq", version: "0.1.1", commands: publicCommands });
+    output(command ? { command, ...publicCommands[command] } : { name: "nutriq", version: "0.1.2", commands: publicCommands });
     return;
   }
   const lines = command ? [
@@ -415,7 +419,7 @@ async function main() {
     return;
   }
   if (command === "--version") {
-    output({ version: "0.1.1" });
+    output({ version: "0.1.2" });
     return;
   }
   const definition = commands[command];
